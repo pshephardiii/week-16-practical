@@ -22,13 +22,15 @@ describe('Test suite for the /todo routes on the api', () => {
   test('It should index all todos', async () => {
     const todo1 = new Todo({ title: 'Eat dinner', description: 'Yummy', completed: false })
     const todo2 = new Todo({ title: 'Take out garbage', description: 'Yuck', completed: true })
+    todo1.save()
+    todo2.save()
     
     const response = await request(app)
       .get('/todos')
       .set('Content-type', 'application/json')
 
     expect(response.statusCode).toBe(200)
-    expect(response.body).toContain(todo2)
+    expect(response.body[0].title).toEqual('Eat dinner')
     
   })
 
@@ -42,15 +44,16 @@ describe('Test suite for the /todo routes on the api', () => {
     expect(response.body.completed).toEqual(false)
   })
 
-  // test('It should get a specific todo item', async () => {
-  //   const todo = new Todo({ title: 'Eat dinner', description: 'Yummy', completed: false })
-  //   const response = await request(app).get(`/todos/${todo._id}`)
+  test('It should get a specific todo item', async () => {
+    const todo = new Todo({ title: 'Eat dinner', description: 'Yummy', completed: false })
+    todo.save()
+    const response = await request(app).get(`/todos/${todo._id}`)
   
-  //   expect(response.statusCode).toBe(200)
-  //   expect(response.body.title).toEqual('Eat dinner')
-  //   expect(response.body.description).toEqual('Yummy')
-  //   expect(response.body.completed).toEqual(false)
-  // })
+    expect(response.statusCode).toBe(200)
+    expect(response.body.title).toEqual('Eat dinner')
+    expect(response.body.description).toEqual('Yummy')
+    expect(response.body.completed).toEqual(false)
+  })
 
   // passes test
   test('It should update a todo item', async () => {
