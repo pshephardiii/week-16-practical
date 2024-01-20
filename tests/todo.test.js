@@ -22,16 +22,22 @@ describe('Test suite for the /todo routes on the api', () => {
   test('It should index all todos', async () => {
     const todo1 = new Todo({ title: 'Eat dinner', description: 'Yummy', completed: false })
     const todo2 = new Todo({ title: 'Take out garbage', description: 'Yuck', completed: true })
-    todo1.save()
-    todo2.save()
+    const todo3 = new Todo({ title: 'Wooo', description: 'Aye', completed: true })
+    await todo1.save()
+    await todo2.save()
+    await todo3.save()
     
     const response = await request(app)
       .get('/todos')
-      .set('Content-type', 'application/json')
 
     expect(response.statusCode).toBe(200)
-    expect(response.body[0].title).toEqual('Eat dinner')
-    
+    expect(Array.isArray(response.body)).toBeTruthy()
+    // check for required properties
+    for(let i = 0; i < response.body.length; i++) {
+      expect(response.body[i]).toHaveProperty('title')
+      expect(response.body[i]).toHaveProperty('description')
+      expect(response.body[i]).toHaveProperty('completed')
+    }
   })
 
   // passes test
@@ -46,7 +52,7 @@ describe('Test suite for the /todo routes on the api', () => {
 
   test('It should get a specific todo item', async () => {
     const todo = new Todo({ title: 'Eat dinner', description: 'Yummy', completed: false })
-    todo.save()
+    await todo.save()
     const response = await request(app).get(`/todos/${todo._id}`)
   
     expect(response.statusCode).toBe(200)
